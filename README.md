@@ -144,11 +144,3 @@ bank_automation_rpa/
 ```
 
 ---
-
-## 📄 Documentation
-
-| Doc | Purpose |
-|---|---|
-| [docs/steerling.md](docs/steerling.md) | Architecture, implementation plan, test plan |
-| [docs/index.md](docs/index.md) | Project index and phase status |
-| [docs/guide.md](docs/guide.md) | AI collaboration guide |
