@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><title>Activity History — <%= customer.name %> — FirstBank CRM</title><%- include('_head') %></head>
+<body>
+  <%- include('_nav', { user, active: 'search' }) %>
+  <div class="container">
+    <a href="/customers/<%= customer.id %>" class="back-link">← Back to Customer</a>
+    <h2>Activity History — <%= customer.name %></h2>
+    <p class="subtitle">Customer ID: <strong><%= customer.id %></strong> &nbsp;|&nbsp; <%= logs.length %> interaction(s) on record.</p>
+    <% if (logs.length === 0) { %>
+      <div class="no-results">No activity history recorded for this customer.</div>
+    <% } else { %>
+      <table class="history-table" id="history-table">
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Type</th>
+            <th>Agent</th>
+            <th>Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% logs.forEach(log => { %>
+          <tr class="history-row">
+            <td class="col-date"><%= log.date %></td>
+            <td class="col-type"><%= log.type %></td>
+            <td class="col-agent"><%= log.agent %></td>
+            <td class="col-notes"><%= log.notes %></td>
+          </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</body>
+</html>

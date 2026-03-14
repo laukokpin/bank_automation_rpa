@@ -1,0 +1,22 @@
+# Netlify config — Cordova browser build
+[build]
+  base    = "mobile"
+  command = "npm run build:browser"
+  publish = "platforms/browser/www"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Inject runtime config into the app via meta tag substitution
+# (N8N_URL is set as a Netlify env var in the dashboard)
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+[[redirects]]
+  from   = "/*"
+  to     = "/index.html"
+  status = 200

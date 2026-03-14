@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <meta http-equiv="Content-Security-Policy"
+    content="default-src 'self' data: gap: https://ssl.gstatic.com;
+             style-src 'self' 'unsafe-inline';
+             script-src 'self' 'unsafe-inline';
+             connect-src *;">
+  <title>BankRPA — Field Agent</title>
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+
+<!-- ── LOGIN SCREEN ── -->
+<div id="screen-login" class="screen active">
+  <div class="login-wrap">
+    <div class="login-logo">🏦</div>
+    <h1>FirstBank</h1>
+    <p class="login-sub">Field Agent Portal</p>
+    <div id="login-error" class="alert alert-error hidden"></div>
+    <div class="form-group">
+      <label>Username</label>
+      <input type="text" id="login-username" placeholder="Network ID" autocomplete="off">
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input type="password" id="login-password" placeholder="Password">
+    </div>
+    <button class="btn btn-primary btn-full" id="btn-login">Sign In</button>
+    <p class="login-footer">Authorised users only. All activity is logged.</p>
+  </div>
+</div>
+
+<!-- ── SEARCH SCREEN ── -->
+<div id="screen-search" class="screen">
+  <header class="app-header">
+    <span class="header-title">Customer Search</span>
+    <button class="header-action" id="btn-logout">Sign Out</button>
+  </header>
+  <div class="screen-body">
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Customer ID, name or account…" autocomplete="off">
+      <button class="btn btn-primary" id="btn-search">Search</button>
+    </div>
+    <div id="search-error" class="alert alert-error hidden"></div>
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<!-- ── CUSTOMER DETAIL SCREEN ── -->
+<div id="screen-detail" class="screen">
+  <header class="app-header">
+    <button class="header-back" id="btn-detail-back">← Back</button>
+    <span class="header-title">Customer Detail</span>
+  </header>
+  <div class="screen-body">
+    <div id="detail-content"></div>
+    <div class="action-row">
+      <button class="btn btn-primary" id="btn-edit">✏️ Edit Record</button>
+      <button class="btn btn-outline" id="btn-history">📋 History</button>
+    </div>
+  </div>
+</div>
+
+<!-- ── EDIT SCREEN ── -->
+<div id="screen-edit" class="screen">
+  <header class="app-header">
+    <button class="header-back" id="btn-edit-back">← Back</button>
+    <span class="header-title">Edit Record</span>
+  </header>
+  <div class="screen-body">
+    <div id="edit-error" class="alert alert-error hidden"></div>
+    <div id="edit-success" class="alert alert-success hidden">✅ Record updated successfully.</div>
+    <form id="edit-form" novalidate>
+      <div class="form-group">
+        <label>Full Name <span class="required">*</span></label>
+        <input type="text" id="edit-name" required>
+      </div>
+      <div class="form-group">
+        <label>Phone Number <span class="required">*</span></label>
+        <input type="tel" id="edit-phone" required>
+      </div>
+      <div class="form-group">
+        <label>Email Address <span class="required">*</span></label>
+        <input type="email" id="edit-email" required>
+      </div>
+      <div class="form-group">
+        <label>Status</label>
+        <select id="edit-status">
+          <option value="Active">Active</option>
+          <option value="Inactive">Inactive</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Notes</label>
+        <textarea id="edit-notes" rows="3"></textarea>
+      </div>
+      <button type="submit" class="btn btn-primary btn-full" id="btn-save">💾 Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<!-- ── HISTORY SCREEN ── -->
+<div id="screen-history" class="screen">
+  <header class="app-header">
+    <button class="header-back" id="btn-history-back">← Back</button>
+    <span class="header-title">Activity History</span>
+  </header>
+  <div class="screen-body">
+    <div id="history-error" class="alert alert-error hidden"></div>
+    <div id="history-list"></div>
+  </div>
+</div>
+
+<!-- Loading overlay -->
+<div id="loading-overlay" class="hidden">
+  <div class="spinner"></div>
+</div>
+
+<script src="cordova.js"></script>
+<script src="js/app.js"></script>
+</body>
+</html>

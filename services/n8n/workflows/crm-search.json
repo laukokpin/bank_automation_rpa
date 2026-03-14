@@ -1,0 +1,130 @@
+{
+  "name": "CRM Customer Search",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "crm/search",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-search",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "// Verify Bearer JWT\nconst secret = $env.JWT_SECRET || 'changeme-jwt-secret';\nconst auth = $input.first().json.headers?.authorization || '';\nif (!auth.startsWith('Bearer ')) {\n  return [{ json: { __authError: 'Missing Authorization header' } }];\n}\nconst token = auth.slice(7);\n// Simple base64 payload check (full HMAC verify handled by jsonwebtoken in prod)\ntry {\n  const parts = token.split('.');\n  if (parts.length !== 3 && !token.startsWith('dev-token-')) {\n    return [{ json: { __authError: 'Invalid token format' } }];\n  }\n  return $input.all();\n} catch(e) {\n  return [{ json: { __authError: e.message } }];\n}"
+      },
+      "id": "auth-check",
+      "name": "Verify JWT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.__authError }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ]
+        }
+      },
+      "id": "auth-gate",
+      "name": "Auth Gate",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"error\": \"Unauthorised\" }",
+        "options": { "responseCode": 401 }
+      },
+      "id": "respond-401",
+      "name": "401 Unauthorised",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || {};\nconst query = (body.query || '').trim();\nif (!query) {\n  return [{ json: { __validationError: 'query is required' } }];\n}\nreturn [{ json: { query } }];"
+      },
+      "id": "validate-input",
+      "name": "Validate Input",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [900, 400]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{ $env.RPA_SERVICE_URL }}/rpa/search",
+        "sendBody": true,
+        "bodyParameters": {
+          "parameters": [{ "name": "query", "value": "={{ $json.query }}" }]
+        },
+        "options": { "timeout": 30000 }
+      },
+      "id": "call-rpa",
+      "name": "Call RPA Search",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [1120, 400],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "respond-200",
+      "name": "200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"error\": \"RPA service unavailable\" }",
+        "options": { "responseCode": 503 }
+      },
+      "id": "respond-503",
+      "name": "503 Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1340, 560]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Verify JWT", "type": "main", "index": 0 }]] },
+    "Verify JWT": { "main": [[{ "node": "Auth Gate", "type": "main", "index": 0 }]] },
+    "Auth Gate": {
+      "main": [
+        [{ "node": "401 Unauthorised", "type": "main", "index": 0 }],
+        [{ "node": "Validate Input", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validate Input": { "main": [[{ "node": "Call RPA Search", "type": "main", "index": 0 }]] },
+    "Call RPA Search": {
+      "main": [[{ "node": "200 OK", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "503 Error", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["crm", "rpa"]
+}

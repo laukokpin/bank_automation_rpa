@@ -1,0 +1,18 @@
+{
+  "name": "mock-crm",
+  "version": "1.0.0",
+  "description": "Simulated legacy banking CRM (web UI, no API)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "dev": "nodemon src/index.js"
+  },
+  "dependencies": {
+    "ejs": "^3.1.10",
+    "express": "^4.18.3",
+    "express-session": "^1.18.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}

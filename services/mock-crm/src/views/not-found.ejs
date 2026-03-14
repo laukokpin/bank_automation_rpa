@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><title>Not Found — FirstBank CRM</title><%- include('_head') %></head>
+<body>
+  <%- include('_nav', { user, active: '' }) %>
+  <div class="container">
+    <div class="no-results" id="not-found-msg">
+      <div style="font-size:48px;margin-bottom:16px;">🔍</div>
+      <strong>Customer "<%= id %>" not found.</strong><br>
+      <a href="/customers/search" style="color:#1a2744;margin-top:12px;display:inline-block;">← Return to Search</a>
+    </div>
+  </div>
+</body>
+</html>

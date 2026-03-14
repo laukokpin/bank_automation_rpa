@@ -1,0 +1,13 @@
+.env
+n8n_data/
+node_modules/
+*/node_modules/
+platforms/
+plugins/
+mobile/platforms/
+mobile/plugins/
+*.apk
+*.aab
+
+# Local Netlify folder
+.netlify

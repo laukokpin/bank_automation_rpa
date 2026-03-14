@@ -1,0 +1,37 @@
+# Fly.io config — n8n (production) + n8n mock (dev/demo)
+app = "bank-rpa-n8n"
+primary_region = "jnb"
+
+[build]
+  image = "n8nio/n8n:latest"
+
+[env]
+  N8N_PORT            = "5678"
+  N8N_PROTOCOL        = "https"
+  GENERIC_TIMEZONE    = "Africa/Johannesburg"
+  N8N_BASIC_AUTH_ACTIVE = "true"
+
+# Secrets set via: fly secrets set N8N_ENCRYPTION_KEY=... JWT_SECRET=... etc.
+
+[http_service]
+  internal_port = 5678
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "30s"
+    interval = "20s"
+    method = "GET"
+    path = "/healthz"
+    timeout = "10s"
+
+[mounts]
+  source = "n8n_data"
+  destination = "/home/node/.n8n"
+
+[[vm]]
+  memory = "512mb"
+  cpu_kind = "shared"
+  cpus = 1

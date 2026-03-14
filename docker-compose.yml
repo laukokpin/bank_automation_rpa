@@ -1,0 +1,71 @@
+services:
+  mock-crm:
+    build: ./services/mock-crm
+    container_name: bank-rpa-crm
+    restart: unless-stopped
+    environment:
+      PORT: 3001
+      CRM_USER: ${CRM_USER:-admin}
+      CRM_PASS: ${CRM_PASS:-demo123}
+    ports:
+      - "3001:3001"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3001/login', r => process.exit(r.statusCode===200?0:1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  rpa:
+    build: ./services/rpa
+    container_name: bank-rpa-rpa
+    restart: unless-stopped
+    depends_on:
+      mock-crm:
+        condition: service_healthy
+    environment:
+      PORT: 3002
+      CRM_URL: http://mock-crm:3001
+      CRM_USER: ${CRM_USER:-admin}
+      CRM_PASS: ${CRM_PASS:-demo123}
+    ports:
+      - "3002:3002"
+    healthcheck:
+      test: ["CMD", "node", "-e", "require('http').get('http://localhost:3002/health', r => process.exit(r.statusCode===200?0:1))"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+
+  n8n:
+    image: n8nio/n8n:latest
+    container_name: bank-rpa-n8n
+    restart: unless-stopped
+    depends_on:
+      rpa:
+        condition: service_healthy
+    ports:
+      - "5678:5678"
+    environment:
+      N8N_HOST: ${N8N_HOST:-localhost}
+      N8N_PORT: 5678
+      N8N_PROTOCOL: http
+      WEBHOOK_URL: http://${N8N_HOST:-localhost}:5678/
+      N8N_BASIC_AUTH_ACTIVE: "true"
+      N8N_BASIC_AUTH_USER: ${N8N_BASIC_AUTH_USER:-admin}
+      N8N_BASIC_AUTH_PASSWORD: ${N8N_BASIC_AUTH_PASSWORD:-n8npass}
+      N8N_ENCRYPTION_KEY: ${N8N_ENCRYPTION_KEY:-changeme-encryption-key}
+      GENERIC_TIMEZONE: Africa/Johannesburg
+      # Allow Code nodes to read env vars via $env
+      N8N_BLOCK_ENV_ACCESS_IN_NODE: "false"
+      # RPA service URL available to all workflow Code nodes
+      RPA_SERVICE_URL: http://rpa:3002
+      JWT_SECRET: ${JWT_SECRET:-changeme-jwt-secret}
+    volumes:
+      - n8n_data:/home/node/.n8n
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:5678/healthz || exit 1"]
+      interval: 20s
+      timeout: 10s
+      retries: 5
+
+volumes:
+  n8n_data:

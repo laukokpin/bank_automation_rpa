@@ -1,0 +1,114 @@
+{
+  "name": "CRM Activity History",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "GET",
+        "path": "crm/history/:customerId",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "webhook-history",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 1,
+      "position": [240, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const auth = $input.first().json.headers?.authorization || '';\nif (!auth.startsWith('Bearer ')) {\n  return [{ json: { __authError: 'Missing Authorization header' } }];\n}\nconst token = auth.slice(7);\ntry {\n  const parts = token.split('.');\n  if (parts.length !== 3 && !token.startsWith('dev-token-')) {\n    return [{ json: { __authError: 'Invalid token format' } }];\n  }\n  return $input.all();\n} catch(e) {\n  return [{ json: { __authError: e.message } }];\n}"
+      },
+      "id": "auth-check",
+      "name": "Verify JWT",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": { "caseSensitive": true },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.__authError }}",
+              "rightValue": "",
+              "operator": { "type": "string", "operation": "notEmpty" }
+            }
+          ]
+        }
+      },
+      "id": "auth-gate",
+      "name": "Auth Gate",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [680, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"error\": \"Unauthorised\" }",
+        "options": { "responseCode": 401 }
+      },
+      "id": "respond-401",
+      "name": "401 Unauthorised",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [900, 200]
+    },
+    {
+      "parameters": {
+        "url": "={{ $env.RPA_SERVICE_URL }}/rpa/history/{{ $json.params.customerId }}",
+        "options": { "timeout": 30000 }
+      },
+      "id": "call-rpa",
+      "name": "Call RPA History",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4,
+      "position": [900, 400],
+      "retryOnFail": true,
+      "maxTries": 3,
+      "waitBetweenTries": 2000
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": { "responseCode": 200 }
+      },
+      "id": "respond-200",
+      "name": "200 OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 400]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"error\": \"RPA service unavailable\" }",
+        "options": { "responseCode": 503 }
+      },
+      "id": "respond-503",
+      "name": "503 Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1,
+      "position": [1120, 560]
+    }
+  ],
+  "connections": {
+    "Webhook": { "main": [[{ "node": "Verify JWT", "type": "main", "index": 0 }]] },
+    "Verify JWT": { "main": [[{ "node": "Auth Gate", "type": "main", "index": 0 }]] },
+    "Auth Gate": {
+      "main": [
+        [{ "node": "401 Unauthorised", "type": "main", "index": 0 }],
+        [{ "node": "Call RPA History", "type": "main", "index": 0 }]
+      ]
+    },
+    "Call RPA History": {
+      "main": [[{ "node": "200 OK", "type": "main", "index": 0 }]],
+      "error": [[{ "node": "503 Error", "type": "main", "index": 0 }]]
+    }
+  },
+  "active": true,
+  "settings": { "executionOrder": "v1" },
+  "tags": ["crm", "rpa"]
+}

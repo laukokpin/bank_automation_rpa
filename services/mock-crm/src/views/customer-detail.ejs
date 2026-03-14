@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><title><%= customer.name %> — FirstBank CRM</title><%- include('_head') %></head>
+<body>
+  <%- include('_nav', { user, active: 'search' }) %>
+  <div class="container">
+    <a href="/customers/search" class="back-link">← Back to Search</a>
+    <h2 id="customer-name"><%= customer.name %></h2>
+    <p class="subtitle">Customer ID: <strong id="customer-id"><%= customer.id %></strong> &nbsp;|&nbsp; <span class="badge badge-<%= customer.status.toLowerCase() %>"><%= customer.status %></span></p>
+    <% if (saved) { %>
+      <div class="alert-success" id="save-confirmation">✅ Customer record updated successfully.</div>
+    <% } %>
+    <div class="detail-grid">
+      <div class="detail-field"><label>Phone</label><span id="detail-phone"><%= customer.phone %></span></div>
+      <div class="detail-field"><label>Email</label><span id="detail-email"><%= customer.email %></span></div>
+      <div class="detail-field"><label>Account Number</label><span><%= customer.account %></span></div>
+      <div class="detail-field"><label>Segment</label><span><%= customer.segment %></span></div>
+      <div class="detail-field"><label>Branch</label><span><%= customer.branch %></span></div>
+      <div class="detail-field"><label>Status</label><span><%= customer.status %></span></div>
+      <div class="detail-field" style="grid-column:span 2"><label>Notes</label><span id="detail-notes"><%= customer.notes %></span></div>
+    </div>
+    <div class="page-actions">
+      <a href="/customers/<%= customer.id %>/edit" class="btn" id="edit-btn">✏️ Edit Record</a>
+      <a href="/customers/<%= customer.id %>/history" class="btn btn-outline" id="history-btn">📋 Activity History</a>
+    </div>
+  </div>
+</body>
+</html>

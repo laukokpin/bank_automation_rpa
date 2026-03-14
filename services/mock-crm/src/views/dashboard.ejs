@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard — FirstBank CRM</title>
+  <%- include('_head') %>
+</head>
+<body>
+  <%- include('_nav', { user, active: 'dashboard' }) %>
+  <div class="container">
+    <h2>Dashboard</h2>
+    <p class="subtitle">Welcome back, <strong><%= user %></strong>. Use the navigation to access customer records.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="card-icon">🔍</div>
+        <div class="card-title">Customer Search</div>
+        <div class="card-desc">Find customers by name, ID, or account number.</div>
+        <a href="/customers/search" class="btn">Open Search</a>
+      </div>
+      <div class="card">
+        <div class="card-icon">📋</div>
+        <div class="card-title">Recent Records</div>
+        <div class="card-desc">View recently accessed customer profiles.</div>
+        <a href="/customers/search?q=" class="btn btn-outline">Browse All</a>
+      </div>
+    </div>
+    <div class="notice">⚠️ This system contains confidential customer information. Unauthorised access is prohibited and monitored.</div>
+  </div>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FirstBank CRM — Login</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: Arial, sans-serif; background: #1a2744; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
+    .login-box { background: #fff; padding: 40px; width: 380px; border-radius: 4px; box-shadow: 0 4px 20px rgba(0,0,0,0.3); }
+    .logo { text-align: center; margin-bottom: 30px; }
+    .logo h1 { font-size: 22px; color: #1a2744; font-weight: bold; }
+    .logo p { font-size: 11px; color: #888; margin-top: 4px; letter-spacing: 1px; text-transform: uppercase; }
+    label { display: block; font-size: 12px; color: #555; margin-bottom: 4px; font-weight: bold; }
+    input[type="text"], input[type="password"] { width: 100%; padding: 10px 12px; border: 1px solid #ccc; border-radius: 3px; font-size: 14px; margin-bottom: 16px; }
+    input:focus { outline: none; border-color: #1a2744; }
+    button { width: 100%; padding: 12px; background: #1a2744; color: #fff; border: none; border-radius: 3px; font-size: 14px; font-weight: bold; cursor: pointer; letter-spacing: 0.5px; }
+    button:hover { background: #243a6b; }
+    .error { background: #fdecea; border: 1px solid #e74c3c; color: #c0392b; padding: 10px 12px; border-radius: 3px; font-size: 13px; margin-bottom: 16px; }
+    .footer { text-align: center; margin-top: 20px; font-size: 11px; color: #aaa; }
+  </style>
+</head>
+<body>
+  <div class="login-box">
+    <div class="logo">
+      <h1>🏦 FirstBank CRM</h1>
+      <p>Customer Relationship Management System v4.2</p>
+    </div>
+    <% if (error) { %>
+      <div class="error" id="login-error"><%= error %></div>
+    <% } %>
+    <form method="POST" action="/login" id="login-form">
+      <label for="username">Network ID</label>
+      <input type="text" id="username" name="username" autocomplete="off" placeholder="e.g. jsmith" required>
+      <label for="password">Password</label>
+      <input type="password" id="password" name="password" required>
+      <button type="submit" id="login-btn">Sign In</button>
+    </form>
+    <div class="footer">FirstBank Internal Systems &copy; 2024 — Authorised Users Only</div>
+  </div>
+</body>
+</html>

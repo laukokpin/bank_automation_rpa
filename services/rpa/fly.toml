@@ -1,0 +1,29 @@
+# Fly.io config — RPA Service
+app = "bank-rpa-rpa"
+primary_region = "jnb"
+
+[build]
+  dockerfile = "Dockerfile"
+
+[env]
+  PORT = "3002"
+
+# CRM_URL and CRM credentials set via: fly secrets set ...
+[http_service]
+  internal_port = 3002
+  force_https = true
+  auto_stop_machines = false
+  auto_start_machines = true
+  min_machines_running = 1
+
+  [[http_service.checks]]
+    grace_period = "15s"
+    interval = "15s"
+    method = "GET"
+    path = "/health"
+    timeout = "5s"
+
+[[vm]]
+  memory = "512mb"   # Playwright needs headroom
+  cpu_kind = "shared"
+  cpus = 1
